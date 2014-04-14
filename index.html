@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no"/>
+        
+        <title>FIT UM</title>
+
+        <!-- CSS -->
+        
+        <!-- TEMA PERSONALIZADO -->
+        <link rel="stylesheet" type="text/css" href="includes/css/fit_theme.css">
+        <link rel="stylesheet" type="text/css" href="includes/css/jqm_structure.css">
+        <link rel="stylesheet" href="includes/css/mobile.css">
+        
+        <!-- ICONO para el iPod o iPhone-->
+        <link rel="apple-touch-icon" href="iconos/ios/Icon-72@2x.png" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+
+        <!-- Splash Images -->
+        <link href="iconos/launchers/loader_320x460.png" media="(device-width: 320px)" rel="apple-touch-startup-image">
+        <link href="iconos/launchers/loader_768_1004.png" media="(device-width: 768px) and (orientation: portrait)" rel="apple-touch-startup-image">
+
+        <!-- JS -->
+        <script src="includes/js/jquery-1.11.0.min.js"></script>
+        <script src="includes/js/variablesGlobales.js"></script>
+        <script src="includes/js/jquery.mobile-1.3.2.min.js"></script>
+        <script src="includes/js/parser.js"></script>
+        <script type="text/javascript" src="http://www.google.com/jsapi?key=AIzaSyB53d648OR67IZ69kRX_4RPaeOZQN4DUx0"></script>
+        
+        <!-- NOTICIAS -->
+        <script>
+        $(document).ready(function(){
+          parseRSS('http://feeds.feedburner.com/FacultadDeIngenieraYTecnologa', '#rss');
+        });
+        </script>
+
+        <!-- EVENTOS -->
+        <script type="text/javascript">
+        /* Loads the Google data JavaScript client library */
+        google.load("gdata", "2.x");
+
+        function init() {
+          // init the Google data JS client library with an error handler
+          //google.gdata.client.init(handleGDError);
+          // load the code.google.com developer calendar
+          //loadDeveloperCalendar();
+          loadCalendarByAddress("gqjmk9qur397vdofeqgofo27qk@group.calendar.google.com");
+        }
+
+
+        /**
+         * Adds a leading zero to a single-digit number.  Used for displaying dates.
+         */
+        function padNumber(num) {
+          if (num <= 9) {
+            return "0" + num;
+          }
+          return num;
+        }
+
+        /**
+         * Determines the full calendarUrl based upon the calendarAddress
+         * argument and calls loadCalendar with the calendarUrl value.
+         *
+         * @param {string} calendarAddress is the email-style address for the calendar
+         */ 
+        function loadCalendarByAddress(calendarAddress) {
+          var calendarUrl = 'https://www.google.com/calendar/feeds/' +
+                            calendarAddress + 
+                            '/public/full';
+          loadCalendar(calendarUrl);
+        }
+
+        /**
+         * Uses Google data JS client library to retrieve a calendar feed from the specified
+         * URL.  The feed is controlled by several query parameters and a callback 
+         * function is called to process the feed results.
+         *
+         * @param {string} calendarUrl is the URL for a public calendar feed
+         */  
+        function loadCalendar(calendarUrl) {
+          var service = new 
+              google.gdata.calendar.CalendarService('gdata-js-client-samples-simple');
+          var query = new google.gdata.calendar.CalendarEventQuery(calendarUrl);
+          query.setOrderBy('starttime');
+          query.setSortOrder('ascending');
+          query.setFutureEvents(true);
+          query.setSingleEvents(true);
+          query.setMaxResults(10);
+
+          service.getEventsFeed(query, listEvents, handleGDError);
+        }
+
+        /**
+         * Callback function for the Google data JS client library to call when an error
+         * occurs during the retrieval of the feed.  Details available depend partly
+         * on the web browser, but this shows a few basic examples. In the case of
+         * a privileged environment using ClientLogin authentication, there may also
+         * be an e.type attribute in some cases.
+         *
+         * @param {Error} e is an instance of an Error 
+         */
+        function handleGDError(e) {
+          document.getElementById('jsSourceFinal').setAttribute('style', 'display:none');
+          if (e instanceof Error) {
+            /* alert with the error line number, file and message */
+            alert('Error en la linea ' + e.lineNumber +
+                  ' en ' + e.fileName + '\n' +
+                  'Mensaje: ' + e.message);
+            /* if available, output HTTP error code and status text */
+            if (e.cause) {
+              var status = e.cause.status;
+              var statusText = e.cause.statusText;
+              alert('Root cause: HTTP error ' + status + ' with status text of: ' + 
+                    statusText);
+            }
+          } else {
+            alert(e.toString());
+          }
+        }
+
+        function convertirMes(mesNumero){
+            var mes = new Array();
+            mes[0] = "Enero";
+            mes[1] = "Febrero";
+            mes[2] = "Marzo";
+            mes[3] = "Abril";
+            mes[4] = "Mayo";
+            mes[5] = "Junio";
+            mes[6] = "Julio";
+            mes[7] = "Augosto";
+            mes[8] = "Septiembre";
+            mes[9] = "Octubre";
+            mes[10]= "Noviembre";
+            mes[11]= "Diciembre";
+
+            var mesConvertido = mes[mesNumero];
+            return mesConvertido;
+        }
+
+        /**
+         * Callback function for the Google data JS client library to call with a feed 
+         * of events retrieved.
+         *
+         * Creates an unordered list of events in a human-readable form.  This list of
+         * events is added into a div called 'events'.  The title for the calendar is
+         * placed in a div called 'calendarTitle'
+         *
+         * @param {json} feedRoot is the root of the feed, containing all entries 
+         */ 
+        function listEvents(feedRoot) {
+          var entries = feedRoot.feed.getEntries();
+          var eventDiv = document.getElementById('events');
+          if (eventDiv.childNodes.length > 0) {
+            eventDiv.removeChild(eventDiv.childNodes[0]);
+          }   
+          /* create a new unordered list */
+          //var ul = document.createElement('ul');
+          //ul.setAttribute("data-role", "listview");
+
+          /* loop through each event in the feed */
+          var len = entries.length;
+          for (var i = 0; i < len; i++) {
+            var entry = entries[i];
+            var title = entry.getTitle().getText();
+            var startDateTime = null;
+            var startJSDate = null;
+            
+            var times = entry.getTimes();
+            if (times.length > 0) {
+              startDateTime = times[0].getStartTime();
+              startJSDate = startDateTime.getDate();
+            }
+            
+            var entryLinkHref = null;
+            if (entry.getHtmlLink() != null) {
+              entryLinkHref = entry.getHtmlLink().getHref();
+            }
+
+            // FECHA Y HORA
+            //var dateString = (startJSDate.getMonth() + 1) + "/" + startJSDate.getDate();
+            var mesNumero = (startJSDate.getMonth());
+            mesNumero = convertirMes(mesNumero);
+
+            var dateString = mesNumero + "-" + startJSDate.getDate();
+
+            if (!startDateTime.isDateOnly()) {
+                dateString += " · Hora: " + startJSDate.getHours() + ":" + 
+                  padNumber(startJSDate.getMinutes());
+            }
+            
+            // 1) Crear elementos HTML
+            var li = document.createElement('li');
+            var titulo = document.createElement('h3');
+            var fecha = document.createElement('p');
+
+            // 2) Agrego atributos para hacer visual el <li>
+            li.setAttribute("class", "ui-li ui-li-static ui-btn-up-a");
+            titulo.setAttribute("class", "ui-li-heading");
+            fecha.setAttribute("class", "ui-li-desc");
+
+            // 3) Agregarle valor a estos elementos
+            titulo.appendChild(document.createTextNode(title));
+            fecha.appendChild(document.createTextNode("Fecha: " + dateString));
+            
+            // 4) Agregar los elementos al <li>
+            li.appendChild(titulo);
+            li.appendChild(fecha);
+            
+            // 5) Agregar el <li> al <ul>
+            eventDiv.appendChild(li);
+          }
+        }
+
+        google.setOnLoadCallback(init);
+        </script>
+        <script type="text/javascript">
+            loadCalendar('gqjmk9qur397vdofeqgofo27qk@group.calendar.google.com');
+        </script>
+    </head>
+
+
+<body>
+	<div data-role="page" data-theme="a" id="home">
+		<header data-role="header">
+			<div class="center-wrapper">
+                <img src="iconos/header/header.png" alt="Facultad de Ingeniería y Tecnología"/>
+            </div>
+		</header>
+                
+		<div data-role="content" >
+        	<ul data-role="listview">
+            	<li>                
+                <a href="#news">
+                <img class="ui-li-icon" src="iconos/menu/166-newspaper.png">
+                Noticias</a>
+                </li>
+
+                <li>                
+                <a href="paginas/oferta_academica.html">
+                <img class="ui-li-icon" src="iconos/menu/140-gradhat.png">
+                Oferta Académica</a>
+                </li>
+                
+                <li>
+                <a href="#eventos">
+                <img class="ui-li-icon" src="iconos/menu/83-calendar.png">
+                Eventos</a>
+                </li>
+                
+                <li>
+                <a href="paginas/personal.html">
+                <img class="ui-li-icon" src="iconos/menu/112-group.png">
+                Personal docente</a>
+                </li>
+                
+                <li>
+                <a href="paginas/social.html">
+                <img class="ui-li-icon" src="iconos/menu/08-chat.png">
+                Social</a>
+                </li>
+                
+                <li>
+                <a href="paginas/directorio.html">
+                <img class="ui-li-icon" src="iconos/menu/75-phone.png">
+                Directorio</a>
+                </li>
+                
+                <li>
+                <a href="mailto:webmasterfit@um.edu.mx?subject=Contacto desde App FIT" target="_system">
+                <img class="ui-li-icon" src="iconos/menu/18-envelope.png">
+                Contacto</a>
+                </li>
+            </ul>	
+        </div>
+        
+        <footer data-role="footer" data-position="fixed" data-id="footerHome">
+            <div class="center-wrapper">
+                <img src="iconos/footer/footer.png" alt="Facultad de Ingeniería y Tecnología"/>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- PÁGINA DE NOTICIAS -->
+    <div data-role="page" id="news" data-theme="a">
+        <header data-role="header" data-position="fixed">
+            <a href="#home" data-icon="arrow-l" data-rel="back">Atrás</a>
+            <h1>Noticias</h1>
+            <a href="" onclick="setTimeout('location.reload(true);',0)" data-icon="refresh" data-iconpos="notext"></a>            
+        </header>
+
+        <div data-role="content">            
+            <ul data-role="listview">
+                <div id="rss"></div>
+            </ul>
+        </div>
+
+        <footer data-role="footer" data-position="fixed" data-id="footerHome">
+            <div class="center-wrapper">
+                <img src="iconos/footer/footer.png" alt="Facultad de Ingeniería y Tecnología"/>
+            </div>
+        </footer>
+    </div>
+
+
+    <!-- PÁGINA DE EVENTOS -->
+    <div data-role="page" id="eventos" data-theme="a">
+        <div data-role="header" data-position="fixed">
+            <a href="#home" class="ui-btn-left" data-icon="arrow-l" data-rel="back">
+                Atrás</a>
+            <h1>Eventos FIT</h1>
+            <a href="" onclick="setTimeout('location.reload(true);',0)" data-icon="refresh" data-iconpos="notext"></a>
+        </div>
+
+        <div data-role="content">
+            <ul data-role="listview" id="events"></ul>
+        </div>
+   
+        <footer data-role="footer" data-position="fixed" data-id="footerHome">
+            <div class="center-wrapper">
+                <img src="iconos/footer/footer.png" alt="Facultad de Ingeniería y Tecnología"/>
+            </div>
+        </footer>
+    </div>
+
+</body>
+</html>  
+		
+ 

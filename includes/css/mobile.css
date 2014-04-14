@@ -1,0 +1,30 @@
+/* imagen */
+
+.center-wrapper {
+	text-align: center;
+}
+
+.center-wrapper * {
+	margin: 0 auto;
+}
+
+.textoCompleto {
+	white-space: normal!important;
+}
+
+h3{
+	font-size: 12px!important;
+	display: inline;
+}
+
+.ui-table-columntoggle-btn {
+	display: none!important;
+}
+
+/*
+#rss a.ui-link-inherit {
+	padding-right: 40px;
+	padding-left: 20px;
+	min-height: 10px;
+}
+*/
